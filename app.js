@@ -6,6 +6,8 @@ const createError = require("http-errors");
 const session = require("express-session");
 const passport = require("passport");
 
+const connectDB = require("./src/configs/mongo");
+
 app.disable('x-powered-by');
 
 app.use("/public", express.static("./src/public"));
@@ -44,7 +46,12 @@ app.get(
     passport.authenticate('google', {
         successRedirect: '/hello',
         failureRedirect: '/auth/fail'
-    })
+    }),
+    // (req, res) => {
+    //     req.user ?
+    //         res.status(200).json({ status: "success", data: req.user }) :
+    //         res.status(200).json({ status: "failed" });
+    // }
 );
 
 app.get('/auth/fail', (req, res) => {
@@ -59,8 +66,8 @@ app.get('/logout', (req, res) => {
 });
 
 app.get('/hello', isLoggedIn, (req, res) => {
-    // console.log(req.user);
-    return res.send(`hello ${req.user.displayName} <a href="/logout">logout</a>`);
+    console.log(req.user);
+    return res.send(`hello <a href="/logout">logout</a>`);
 });
 
 // app.use((req, res, next) => {
@@ -73,5 +80,7 @@ app.get('/hello', isLoggedIn, (req, res) => {
 //         message: err.message,
 //     });
 // });
+
+connectDB();
 
 module.exports = app;
